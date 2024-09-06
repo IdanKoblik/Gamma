@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base: '/Gamma',
   title: "Gamma",
   description: "Documentation website for Gamma api",
   logo: 'gamma.svg',
