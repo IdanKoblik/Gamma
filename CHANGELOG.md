@@ -1,4 +1,1 @@
 # CHANGELOG
-
-## v0.2-SNAPSHOT
-Nothing 
