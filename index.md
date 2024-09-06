@@ -7,7 +7,7 @@ hero:
   text: "Spigot minigame api"
   tagline: Official documentation
   image:
-    src: /gamma.svg
+    src: /img/gamma.svg
     alt: VitePress
     
   actions:
