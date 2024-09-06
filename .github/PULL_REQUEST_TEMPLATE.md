@@ -13,6 +13,3 @@ Ensure that your `pull request` has followed all the steps below:
 - [ ] Extended the documentation, if applicable
 
 ### Description
-
-> Ask the contributor to describe his `pull request`.
-
