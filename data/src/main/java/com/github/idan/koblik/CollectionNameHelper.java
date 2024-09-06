@@ -28,9 +28,14 @@ public class CollectionNameHelper {
     public static final String GAME = "game";
 
     /**
-     * The collection name for game statistics.
+     * The collection name for game player statistics.
      */
     public static final String GAME_STATS = "game-stats";
+
+    /**
+     * The collection name for pre game load data (min_players, max_players, etc...)
+     */
+    public static final String GAME_DATA = "game-data";
 
     /**
      * A list of allowed collection names.

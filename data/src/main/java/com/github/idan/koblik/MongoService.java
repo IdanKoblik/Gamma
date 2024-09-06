@@ -9,7 +9,6 @@ import com.mongodb.client.model.Updates;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Constructor;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -41,13 +40,13 @@ public class MongoService<T extends GameModel> {
         this.type = type;
     }
 
-    private String getCollectionName() throws UnsupportedGameModel {
+    private String getCollectionName() throws UnsupportedGameModelException {
         GameCollection annotation = type.getAnnotation(GameCollection.class);
         if (annotation == null)
-            throw new UnsupportedGameModel("GameModel record missing GameCollection annotation");
+            throw new UnsupportedGameModelException("GameModel record missing GameCollection annotation");
 
         if (!CollectionNameHelper.getInstance().isSupported(annotation.name()) || annotation.name().isEmpty())
-            throw new UnsupportedGameModel("GameModel name unsupported");
+            throw new UnsupportedGameModelException("GameModel name unsupported");
 
         return annotation.name();
     }

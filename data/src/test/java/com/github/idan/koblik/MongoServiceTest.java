@@ -43,13 +43,13 @@ public class MongoServiceTest<T> {
         MongoService<InvalidNameDummyGameModel> invalidNameMongoService = new MongoService<>(this.database, InvalidNameDummyGameModel.class);
 
         assertThrows(ExecutionException.class, () -> invalidNameMongoService.insert(invalidName).get());
-        assertThrows(UnsupportedGameModel.class, () -> invalidNameMongoService.insertSync(invalidName));
+        assertThrows(UnsupportedGameModelException.class, () -> invalidNameMongoService.insertSync(invalidName));
 
         MissingAnnotationDummyGameModel missingAnnotation = new MissingAnnotationDummyGameModel(UUID.randomUUID(), "");
         MongoService<MissingAnnotationDummyGameModel> missingAnnotationMongoService = new MongoService<>(this.database, MissingAnnotationDummyGameModel.class);
 
         assertThrows(ExecutionException.class, () -> missingAnnotationMongoService.insert(missingAnnotation).get());
-        assertThrows(UnsupportedGameModel.class, () -> missingAnnotationMongoService.insertSync(missingAnnotation));
+        assertThrows(UnsupportedGameModelException.class, () -> missingAnnotationMongoService.insertSync(missingAnnotation));
     }
 
     @Test
