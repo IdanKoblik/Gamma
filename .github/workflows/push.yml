@@ -1,0 +1,11 @@
+name: Push CI
+
+on:
+  push:
+    branches:
+      - 'main'
+      - '3-gitops'
+
+jobs:
+  unit_test:
+    uses: ./.github/workflows/callable.test.yml
