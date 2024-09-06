@@ -1,5 +1,7 @@
 package com.github.idan.koblik;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -14,5 +16,5 @@ public @interface GameCollection {
     /**
      * Name of the collection
      */
-    String name();
+    @NotNull String name();
 }

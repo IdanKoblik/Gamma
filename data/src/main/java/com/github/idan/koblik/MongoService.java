@@ -1,5 +1,7 @@
 package com.github.idan.koblik;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -19,8 +21,14 @@ import java.util.concurrent.CompletableFuture;
  * @see GameModel
  */
 public class MongoService<T extends GameModel> {
+
     private final MongoDatabase database;
     private final Class<T> type;
+    private final ObjectMapper objectMapper = new ObjectMapper(); // Jackson ObjectMapper
+
+    public MongoDatabase getDatabase() {
+        return database;
+    }
 
     /**
      * Constructs a MongoService instance.
@@ -28,7 +36,7 @@ public class MongoService<T extends GameModel> {
      * @param database The MongoDB database instance.
      * @param type     The class type of the game model.
      */
-    public MongoService(MongoDatabase database, Class<T> type) {
+    public MongoService(@NotNull MongoDatabase database, @NotNull Class<T> type) {
         this.database = database;
         this.type = type;
     }
@@ -37,19 +45,16 @@ public class MongoService<T extends GameModel> {
         GameCollection annotation = type.getAnnotation(GameCollection.class);
         if (annotation == null)
             throw new UnsupportedGameModel("GameModel record missing GameCollection annotation");
-        else if (CollectionNameHelper.getInstance().isSupported(annotation.name()))
-            return annotation.name();
-        else
+
+        if (!CollectionNameHelper.getInstance().isSupported(annotation.name()) || annotation.name().isEmpty())
             throw new UnsupportedGameModel("GameModel name unsupported");
 
+        return annotation.name();
     }
 
     private @NotNull MongoCollection<Document> getCollection() {
-        try {
-            return database.getCollection(getCollectionName());
-        } catch (UnsupportedGameModel e) {
-            throw new RuntimeException(e);
-        }
+        String collectionName = getCollectionName();
+        return database.getCollection(collectionName);
     }
 
     /**
@@ -137,7 +142,7 @@ public class MongoService<T extends GameModel> {
      */
     public void insertSync(@NotNull T data) {
         MongoCollection<Document> collection = getCollection();
-        Document doc = Document.parse(data.toString());
+        Document doc = toDocument(data);
         collection.insertOne(doc);
     }
 
@@ -149,8 +154,8 @@ public class MongoService<T extends GameModel> {
      */
     public void updateSync(@NotNull UUID id, @NotNull T data) {
         MongoCollection<Document> collection = getCollection();
-        Document doc = Document.parse(data.toString());
-        collection.replaceOne(Filters.eq("id", id.toString()), doc);
+        Document doc = toDocument(data);
+        collection.replaceOne(Filters.eq("_id", id.toString()), doc);
     }
 
     /**
@@ -160,7 +165,7 @@ public class MongoService<T extends GameModel> {
      */
     public void removeSync(@NotNull UUID id) {
         MongoCollection<Document> collection = getCollection();
-        collection.deleteOne(Filters.eq("id", id.toString()));
+        collection.deleteOne(Filters.eq("_id", id.toString()));
     }
 
     /**
@@ -172,7 +177,7 @@ public class MongoService<T extends GameModel> {
      */
     public T getSync(@NotNull UUID id, Class<T> clazz) {
         MongoCollection<Document> collection = getCollection();
-        Document doc = collection.find(Filters.eq("id", id.toString())).first();
+        Document doc = collection.find(Filters.eq("_id", id.toString())).first();
         if (doc != null) {
             try {
                 return fromDocument(doc, clazz);
@@ -192,7 +197,7 @@ public class MongoService<T extends GameModel> {
      */
     public void incrementFieldSync(@NotNull UUID id, String fieldName, long amount) {
         MongoCollection<Document> collection = getCollection();
-        collection.updateOne(Filters.eq("id", id.toString()), Updates.inc(fieldName, amount));
+        collection.updateOne(Filters.eq("_id", id.toString()), Updates.inc(fieldName, amount));
     }
 
     /**
@@ -204,7 +209,7 @@ public class MongoService<T extends GameModel> {
      */
     public void addToCollectionSync(@NotNull UUID id, String collectionName, Object item) {
         MongoCollection<Document> collection = getCollection();
-        collection.updateOne(Filters.eq("id", id.toString()), Updates.push(collectionName, item));
+        collection.updateOne(Filters.eq("_id", id.toString()), Updates.push(collectionName, item));
     }
 
     /**
@@ -216,11 +221,20 @@ public class MongoService<T extends GameModel> {
      */
     public void removeFromCollectionSync(@NotNull UUID id, String collectionName, Object item) {
         MongoCollection<Document> collection = getCollection();
-        collection.updateOne(Filters.eq("id", id.toString()), Updates.pull(collectionName, item));
+        collection.updateOne(Filters.eq("_id", id.toString()), Updates.pull(collectionName, item));
+    }
+
+    private @NotNull Document toDocument(@NotNull T data) {
+        try {
+            String jsonString = objectMapper.writeValueAsString(data);
+            return Document.parse(jsonString);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize object to JSON", e);
+        }
     }
 
     private @NotNull T fromDocument(@NotNull Document doc, @NotNull Class<T> clazz) throws Exception {
-        Constructor<T> constructor = clazz.getConstructor(String.class);
-        return constructor.newInstance(doc.toJson());
+        String jsonString = doc.toJson();
+        return objectMapper.readValue(jsonString, clazz);
     }
 }
