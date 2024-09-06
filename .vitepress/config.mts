@@ -5,7 +5,7 @@ export default defineConfig({
   base: '/Gamma',
   title: "Gamma",
   description: "Documentation website for Gamma api",
-  logo: '/img/gamma.svg',
+  logo: 'https://raw.githubusercontent.com/IdanKoblik/Gamma/pages/img/gamma.svg',
   themeConfig: {
 
 
