@@ -5,7 +5,7 @@ export default defineConfig({
   base: '/Gamma',
   title: "Gamma",
   description: "Documentation website for Gamma api",
-  logo: 'gamma.svg',
+  logo: 'img/gamma.svg',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
