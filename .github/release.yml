@@ -1,0 +1,9 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Version name'
+        required: true
+        type: string
