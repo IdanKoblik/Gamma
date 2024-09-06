@@ -1,4 +1,4 @@
 # CHANGELOG
 
-## v0.1-SNAPSHOT
+## v0.2-SNAPSHOT
 Nothing 

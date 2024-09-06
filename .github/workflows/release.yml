@@ -42,6 +42,14 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
+      - name: Run integration tests
+        run: ./gradlew publish
+        env:
+          VERSION: ${{ github.event.inputs.name }}
+          APARTIUM_NEXUS_USERNAME: ${{ secrets.APARTIUM_NEXUS_USERNAME }}
+          APARTIUM_NEXUS_PASSWORD: ${{ secrets.APARTIUM_NEXUS_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Tag
         run: |
           TAG_VERSION=${{ github.event.inputs.name }}
