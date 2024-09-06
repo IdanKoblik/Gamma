@@ -33,13 +33,23 @@ public class MongoService<T extends GameModel> {
         this.type = type;
     }
 
-    private String getCollectionName() {
+    private String getCollectionName() throws UnsupportedGameModel {
         GameCollection annotation = type.getAnnotation(GameCollection.class);
-        return annotation != null ? annotation.name() : type.getSimpleName().toLowerCase();
+        if (annotation == null)
+            throw new UnsupportedGameModel("GameModel record missing GameCollection annotation");
+        else if (CollectionNameHelper.getInstance().isSupported(annotation.name()))
+            return annotation.name();
+        else
+            throw new UnsupportedGameModel("GameModel name unsupported");
+
     }
 
     private @NotNull MongoCollection<Document> getCollection() {
-        return database.getCollection(getCollectionName());
+        try {
+            return database.getCollection(getCollectionName());
+        } catch (UnsupportedGameModel e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
