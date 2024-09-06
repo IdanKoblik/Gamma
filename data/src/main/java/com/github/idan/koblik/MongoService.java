@@ -23,7 +23,7 @@ public class MongoService<T extends GameModel> {
 
     private final MongoDatabase database;
     private final Class<T> type;
-    private final ObjectMapper objectMapper = new ObjectMapper(); // Jackson ObjectMapper
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public MongoDatabase getDatabase() {
         return database;
